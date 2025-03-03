@@ -108,6 +108,10 @@
     <script type="module">
         // Get references to buttons and input containers
         import { Octokit } from 'https://esm.sh/@octokit/rest@19.0.0';
+        // Replace these with your repository information
+        const REPO_OWNER = 'antiespada';
+        const REPO_NAME = 'clasificadorNoticias';
+        const OAUTH_CLIENT_ID = 'Ov23lig89kOjXRITNJG2'; // Create GitHub OAuth App
         
         const fileButton = document.getElementById('fileButton');
         const textButton = document.getElementById('textButton');
@@ -176,45 +180,44 @@
         });
 
         // Function to trigger the GitHub Actions workflow
-        async function triggerWorkflow(inputValue) {
-            try {
-                if (typeof Octokit === 'undefined') {
-                    throw new Error('Octokit not loaded. Check the CDN link.');
-                }
-                const octokit = new Octokit({
-                    auth: process.env.GITHUB_TOKEN, // Replace with your GitHub token
-                });
-
-                // Trigger the workflow
-                const workflowResponse = await octokit.actions.createWorkflowDispatch({
-                    owner: 'antiespada', // Replace with your GitHub username
-                    repo: 'clasificadorNoticias', // Replace with your repository name
-                    workflow_id: 'main.yml', // Name of the workflow file
-                    ref: 'main', // Branch name
-                    inputs: {
-                        input_value: inputValue, // The first line of the text
-                    },
-                });
-
-                console.log('Workflow triggered:', workflowResponse.status);
-
-                // Wait for the workflow to complete and retrieve the artifact
-                const artifact = await octokit.actions.downloadArtifact({
-                    owner: 'antiespada',
-                    repo: 'clasificadorNoticias',
-                    artifact_id: 'ai-response', // Name of the artifact
-                    archive_format: 'zip',
-                });
-
-                console.log('AI Response:', artifact.data);
-
-                // Display the response in the label
-                responseText.textContent = artifact.data;
-                responseLabel.classList.remove('hidden');
-            } catch (error) {
-                console.error('Error:', error);
+       async function getGitHubToken() {
+        const auth = new Octokit.authOAuthDevice({
+            clientType: 'oauth-app',
+            clientId: OAUTH_CLIENT_ID,
+            scopes: ['repo'],
+            onVerification: (verification) => {
+                alert(`Open ${verification.verification_uri}\nEnter code: ${verification.user_code}`);
             }
+        });
+        return (await auth()).token;
+    }
+
+    async function triggerWorkflow(inputValue) {
+        try {
+            const token = await getGitHubToken();
+            const octokit = new Octokit({ auth: token });
+
+            // Trigger repository dispatch event
+            await octokit.repos.createDispatchEvent({
+                owner: REPO_OWNER,
+                repo: REPO_NAME,
+                event_type: 'process-input',
+                client_payload: {
+                    text: inputValue,
+                    timestamp: new Date().toISOString()
+                }
+            });
+
+            // Show status message
+            responseText.textContent = 'Processing started! Check GitHub Actions for results.';
+            responseLabel.classList.remove('hidden');
+
+        } catch (error) {
+            console.error('Error:', error);
+            responseText.textContent = 'Error triggering processing';
+            responseLabel.classList.remove('hidden');
         }
+    }
     </script>
 </body>
 </html>
