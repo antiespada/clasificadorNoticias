@@ -189,7 +189,7 @@
                 const workflowResponse = await octokit.actions.createWorkflowDispatch({
                     owner: 'antiespada', // Replace with your GitHub username
                     repo: 'clasificadorNoticias', // Replace with your repository name
-                    workflow_id: 'python-workflow.yml', // Name of the workflow file
+                    workflow_id: 'main.yml', // Name of the workflow file
                     ref: 'main', // Branch name
                     inputs: {
                         input_value: inputValue, // The first line of the text
