@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       input_value:
-        description: 'The first line of the text'
+        description: 'Input text/file/link'
         required: true
 
 jobs:
@@ -12,23 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Optional: Update checkout to v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5  # Optional: Update setup-python to v5
         with:
           python-version: '3.9'
 
-      - name: Run Python script
-        id: run-python
+      - name: Install dependencies
         run: |
-          OUTPUT=$(python ai_model.py "${{ github.event.inputs.input_value }}")
-          echo "AI Response: $OUTPUT"
-          echo "response=$OUTPUT" >> $GITHUB_OUTPUT
+          pip install transformers torch
 
-      - name: Upload output as artifact
-        uses: actions/upload-artifact@v3
+      - name: Run Python script
+        run: |
+          python ai_model.py "${{ github.event.inputs.input_value }}"
+
+      - name: Save output as artifact
+        uses: actions/upload-artifact@v4  # Updated to v4
         with:
           name: ai-response
-          path: response.txt
-          contents: ${{ steps.run-python.outputs.response }}
+          path: output.txt  # Ensure your script writes output to this file
