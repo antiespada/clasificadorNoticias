@@ -142,9 +142,9 @@ async function triggerWorkflow(inputValue) {
   try {
     // Trigger the workflow
     const workflowResponse = await octokit.actions.createWorkflowDispatch({
-      owner: 'your-username', // Replace with your GitHub username
-      repo: 'your-repo', // Replace with your repository name
-      workflow_id: 'call-python.yml', // Name of the workflow file
+      owner: 'antiespada', // Replace with your GitHub username
+      repo: 'clasificadorNoticias', // Replace with your repository name
+      workflow_id: 'python-workflow.yml', // Name of the workflow file
       ref: 'main', // Branch name
       inputs: {
         input_value: inputValue, // The first line of the text
