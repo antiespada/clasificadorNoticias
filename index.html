@@ -105,8 +105,10 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         // Get references to buttons and input containers
+        import { Octokit } from 'https://esm.sh/@octokit/rest@19.0.0';
+        
         const fileButton = document.getElementById('fileButton');
         const textButton = document.getElementById('textButton');
         const linkButton = document.getElementById('linkButton');
@@ -176,10 +178,10 @@
         // Function to trigger the GitHub Actions workflow
         async function triggerWorkflow(inputValue) {
             try {
-                if (typeof window.Octokit === 'undefined') {
+                if (typeof Octokit === 'undefined') {
                     throw new Error('Octokit not loaded. Check the CDN link.');
                 }
-                const octokit = new window.Octokit({
+                const octokit = new Octokit({
                     auth: 'process.env.NTCS_TOKEN', // Replace with your GitHub token
                 });
 
