@@ -155,8 +155,8 @@ async function triggerWorkflow(inputValue) {
 
     // Wait for the workflow to complete and retrieve the artifact
     const artifact = await octokit.actions.downloadArtifact({
-      owner: 'your-username',
-      repo: 'your-repo',
+      owner: 'antiespada',
+      repo: 'clasificadorNoticias',
       artifact_id: 'ai-response', // Name of the artifact
       archive_format: 'zip',
     });
