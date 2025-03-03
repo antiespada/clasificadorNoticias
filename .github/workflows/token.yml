@@ -1,0 +1,13 @@
+name: Run token
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run script
+        env:
+          GITHUB_TOKEN: ${{ secrets.NTCS_TOKEN }}  # Secret injected here
