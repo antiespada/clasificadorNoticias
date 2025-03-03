@@ -1,0 +1,34 @@
+name: Run Python AI Model
+
+on:
+  workflow_dispatch:
+    inputs:
+      input_value:
+        description: 'The first line of the text'
+        required: true
+
+jobs:
+  run-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Run Python script
+        id: run-python
+        run: |
+          OUTPUT=$(python ai_model.py "${{ github.event.inputs.input_value }}")
+          echo "AI Response: $OUTPUT"
+          echo "response=$OUTPUT" >> $GITHUB_OUTPUT
+
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ai-response
+          path: response.txt
+          contents: ${{ steps.run-python.outputs.response }}
