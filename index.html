@@ -1,4 +1,3 @@
-index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -69,6 +68,12 @@ index.html
         .hidden {
             display: none;
         }
+
+        #response-label {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +97,11 @@ index.html
         <div class="input-container hidden" id="linkInputContainer">
             <input type="url" id="linkInput" placeholder="Enter your link here">
         </div>
-        <textarea id="content-target"></textarea>
+
+        <!-- Response Label -->
+        <div id="response-label" class="hidden">
+            <strong>Respuesta:</strong> <span id="response-text"></span>
+        </div>
     </div>
 
     <script>
@@ -104,11 +113,14 @@ index.html
         const fileInputContainer = document.getElementById('fileInputContainer');
         const textInputContainer = document.getElementById('textInputContainer');
         const linkInputContainer = document.getElementById('linkInputContainer');
+        const responseLabel = document.getElementById('response-label');
+        const responseText = document.getElementById('response-text');
 
         // Hide all input containers initially
         fileInputContainer.classList.add('hidden');
         textInputContainer.classList.add('hidden');
         linkInputContainer.classList.add('hidden');
+        responseLabel.classList.add('hidden');
 
         // Show file input when "Upload a File" is clicked
         fileButton.addEventListener('click', () => {
@@ -132,88 +144,71 @@ index.html
         });
 
         // Handle file input
-       const { Octokit } = require("@octokit/rest");
+        const fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const fileContent = e.target.result;
+                const firstLine = fileContent.split('\n')[0]; // Get the first line
+                triggerWorkflow(firstLine); // Send the first line to the workflow
+            };
+            reader.readAsText(file);
+        });
 
-const octokit = new Octokit({
-  auth: 'your-github-token', // Replace with your GitHub token
-});
-
-async function triggerWorkflow(inputValue) {
-  try {
-    // Trigger the workflow
-    const workflowResponse = await octokit.actions.createWorkflowDispatch({
-      owner: 'antiespada', // Replace with your GitHub username
-      repo: 'clasificadorNoticias', // Replace with your repository name
-      workflow_id: 'python-workflow.yml', // Name of the workflow file
-      ref: 'main', // Branch name
-      inputs: {
-        input_value: inputValue, // The first line of the text
-      },
-    });
-
-    console.log('Workflow triggered:', workflowResponse.status);
-
-    // Wait for the workflow to complete and retrieve the artifact
-    const artifact = await octokit.actions.downloadArtifact({
-      owner: 'antiespada',
-      repo: 'clasificadorNoticias',
-      artifact_id: 'ai-response', // Name of the artifact
-      archive_format: 'zip',
-    });
-
-    console.log('AI Response:', artifact.data);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-// Handle file input
-const fileInput = document.getElementById('fileInput');
-fileInput.addEventListener('change', (event) => {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const fileContent = e.target.result;
-    const firstLine = fileContent.split('\n')[0]; // Get the first line
-    triggerWorkflow(firstLine); // Send the first line to the workflow
-  };
-  reader.readAsText(file);
-});
-
-// Handle text input
-const textInput = document.getElementById('textInput');
-textInput.addEventListener('input', (event) => {
-  const text = event.target.value;
-  const firstLine = text.split('\n')[0]; // Get the first line
-  triggerWorkflow(firstLine); // Send the first line to the workflow
-});
-
-// Handle link input
-const linkInput = document.getElementById('linkInput');
-linkInput.addEventListener('input', (event) => {
- const axios = require('axios');
-			const cheerio = require('cheerio');
-
-			axios.get('input') // Reemplaza con la URL de la noticia
-			  .then(response => {
-				const $ = cheerio.load(response.data);
-				const primerParrafo = $('p').first(); // Selecciona el primer 
-
-
-				
-				if (primerParrafo.length) {
-				  console.log(primerParrafo.text()); // Muestra el contenido del primer párrafo
-				} else {
-				  console.log('No se encontró el primer párrafo.');
-				}
-			  })
-			  .catch(error => console.error('Error:', error));
-  triggerWorkflow(axios); // Send the link to the workflow
-});
+        // Handle text input
+        const textInput = document.getElementById('textInput');
+        textInput.addEventListener('input', (event) => {
+            const text = event.target.value;
+            const firstLine = text.split('\n')[0]; // Get the first line
+            triggerWorkflow(firstLine); // Send the first line to the workflow
+        });
 
         // Handle link input
-       
-        
+        const linkInput = document.getElementById('linkInput');
+        linkInput.addEventListener('input', (event) => {
+            const link = event.target.value;
+            // For links, you can send the link itself or scrape the first line
+            triggerWorkflow(link); // Send the link to the workflow
+        });
+
+        // Function to trigger the GitHub Actions workflow
+        async function triggerWorkflow(inputValue) {
+            try {
+                const octokit = new Octokit({
+                    auth: 'your-github-token', // Replace with your GitHub token
+                });
+
+                // Trigger the workflow
+                const workflowResponse = await octokit.actions.createWorkflowDispatch({
+                    owner: 'antiespada', // Replace with your GitHub username
+                    repo: 'clasificadorNoticias', // Replace with your repository name
+                    workflow_id: 'python-workflow.yml', // Name of the workflow file
+                    ref: 'main', // Branch name
+                    inputs: {
+                        input_value: inputValue, // The first line of the text
+                    },
+                });
+
+                console.log('Workflow triggered:', workflowResponse.status);
+
+                // Wait for the workflow to complete and retrieve the artifact
+                const artifact = await octokit.actions.downloadArtifact({
+                    owner: 'antiespada',
+                    repo: 'clasificadorNoticias',
+                    artifact_id: 'ai-response', // Name of the artifact
+                    archive_format: 'zip',
+                });
+
+                console.log('AI Response:', artifact.data);
+
+                // Display the response in the label
+                responseText.textContent = artifact.data;
+                responseLabel.classList.remove('hidden');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
     </script>
 </body>
 </html>
