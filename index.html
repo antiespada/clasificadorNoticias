@@ -192,10 +192,40 @@
         });
         return (await auth()).token;
     }
+    async function authenticateUser() {
+        const auth = createOAuthAppAuth({
+            clientType: 'oauth-app',
+            clientId: CLIENT_ID,
+            scopes: ['repo'],
+            redirectUrl: window.location.href
+        });
 
-    async function triggerWorkflow(inputValue) {
+        const token = await auth({
+            type: 'oauth-user',
+            factory: (options) => {
+                return {
+                    async getToken() {
+                        if (!window.location.search) {
+                            window.location.href = options.url;
+                            return { token: '' };
+                        }
+                        
+                        const { token } = await auth({
+                            type: 'oauth-user',
+                            code: new URLSearchParams(window.location.search).get('code')
+                        });
+                        
+                        return { token };
+                    }
+                };
+            }
+        });
+
+        return token.token;
+    }
+     async function triggerWorkflow(inputValue) {
         try {
-            const token = await getGitHubToken();
+            const token = await authenticateUser();
             const octokit = new Octokit({ auth: token });
 
             // Trigger repository dispatch event
@@ -203,19 +233,15 @@
                 owner: REPO_OWNER,
                 repo: REPO_NAME,
                 event_type: 'process-input',
-                client_payload: {
-                    text: inputValue,
-                    timestamp: new Date().toISOString()
-                }
+                client_payload: { text: inputValue }
             });
 
-            // Show status message
-            responseText.textContent = 'Processing started! Check GitHub Actions for results.';
+            responseText.textContent = 'Processing started! Check GitHub Actions.';
             responseLabel.classList.remove('hidden');
 
         } catch (error) {
             console.error('Error:', error);
-            responseText.textContent = 'Error triggering processing';
+            responseText.textContent = 'Error: ' + error.message;
             responseLabel.classList.remove('hidden');
         }
     }
