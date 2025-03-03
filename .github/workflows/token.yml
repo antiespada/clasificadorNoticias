@@ -1,13 +1,22 @@
 name: Run token
 
+# Add the 'on' key to define workflow triggers
+on:
+  workflow_dispatch:  # Allows manual triggering from GitHub UI
+
 jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+
       - name: Run script
         env:
-          GITHUB_TOKEN: ${{ secrets.NTCS_TOKEN }}  # Secret injected here
+          GITHUB_TOKEN: ${{ secrets.NTCS_TOKEN }}  # Fixed syntax (remove extra '}')
+        run: node token.js  # Replace with your script name
