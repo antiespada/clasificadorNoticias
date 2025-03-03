@@ -1,34 +1,28 @@
-name: Run Python AI Model
-
+name: Process Input
 on:
-  workflow_dispatch:
-    inputs:
-      input_value:
-        description: 'Input text/file/link'
-        required: true
+  repository_dispatch:
+    types: [process-input]
 
 jobs:
-  run-python:
+  process:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4  # Optional: Update checkout to v4
-
+      - uses: actions/checkout@v4
+      
       - name: Set up Python
-        uses: actions/setup-python@v5  # Optional: Update setup-python to v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-
-      - name: Install dependencies
+          
+      - name: Process input
+        env:
+          INPUT_TEXT: ${{ github.event.client_payload.text }}
         run: |
-          pip install transformers torch
-
-      - name: Run Python script
-        run: |
-          python ai_model.py "${{ github.event.inputs.input_value }}"
-
-      - name: Save output as artifact
-        uses: actions/upload-artifact@v4  # Updated to v4
+          echo "Processing text: $INPUT_TEXT"
+          python process.py "$INPUT_TEXT" > output.txt
+          
+      - name: Upload result
+        uses: actions/upload-artifact@v4
         with:
           name: ai-response
-          path: output.txt  # Ensure your script writes output to this file
+          path: output.txt
