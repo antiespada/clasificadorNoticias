@@ -177,7 +177,7 @@
         async function triggerWorkflow(inputValue) {
             try {
                 const octokit = new Octokit({
-                    auth: 'your-github-token', // Replace with your GitHub token
+                    auth: 'process.env.NTCS_TOKEN', // Replace with your GitHub token
                 });
 
                 // Trigger the workflow
