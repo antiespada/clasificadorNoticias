@@ -176,27 +176,35 @@
 
 
         // Handle link input
-        const linkInput = document.getElementById('linkInput');
-        linkInput.addEventListener('input', (event) => {
-            if (event.key === 'Enter') {
+       const linkInput = document.getElementById('linkInput');
+        linkInput.addEventListener('keydown', async (event) => {
+          if (event.key === 'Enter') {
             event.preventDefault(); // Prevents the default action (e.g., adding a newline)
             const link = event.target.value;
-            processInput(link); // Send the first line to the workflow
+            try {
+              const response = await fetch(link);
+              if (!response.ok) {
+                console.error('Failed to fetch the link, status:', response.status);
+                return;
+              }
+              const htmlText = await response.text();
+              
+              // Parse the HTML using DOMParser
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(htmlText, 'text/html');
+              const firstParagraph = doc.querySelector('p');
+              
+              if (firstParagraph) {
+                const paragraphText = firstParagraph.textContent.trim();
+                processInput(paragraphText); // Send the first paragraph text to the workflow
+              } else {
+                console.error('No paragraph element found in the fetched page.');
+              }
+            } catch (error) {
+              console.error('Error fetching or processing the link:', error);
+            }
           }
         });
-
-        // Function to trigger the GitHub Actions workflow
-       async function getGitHubToken() {
-        const auth = new Octokit.authOAuthDevice({
-            clientType: 'oauth-app',
-            clientId: OAUTH_CLIENT_ID,
-            scopes: ['repo'],
-            onVerification: (verification) => {
-                alert(`Open ${verification.verification_uri}\nEnter code: ${verification.user_code}`);
-            }
-        });
-        return (await auth()).token;
-    }
    async function processInput(text) {
   try {
     // Step 1: Trigger processing
