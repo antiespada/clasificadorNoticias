@@ -196,7 +196,10 @@
     // Step 1: Trigger processing
     const response = await fetch('https://watery-topaz-thunder.glitch.me/process', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors', // Ensure CORS mode is set
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({ text })
     });
     
