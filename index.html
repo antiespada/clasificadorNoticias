@@ -158,7 +158,7 @@
             reader.onload = (e) => {
                 const fileContent = e.target.result;
                 const firstLine = fileContent.split('\n')[0]; // Get the first line
-                triggerWorkflow(firstLine); // Send the first line to the workflow
+                processInput(firstLine); // Send the first line to the workflow
             };
             reader.readAsText(file);
         });
@@ -168,7 +168,7 @@
         textInput.addEventListener('input', (event) => {
             const text = event.target.value;
             const firstLine = text.split('\n')[0]; // Get the first line
-            triggerWorkflow(firstLine); // Send the first line to the workflow
+            processInput(firstLine); // Send the first line to the workflow
         });
 
         // Handle link input
@@ -176,7 +176,7 @@
         linkInput.addEventListener('input', (event) => {
             const link = event.target.value;
             // For links, you can send the link itself or scrape the first line
-            triggerWorkflow(link); // Send the link to the workflow
+            processInput(link); // Send the link to the workflow
         });
 
         // Function to trigger the GitHub Actions workflow
@@ -191,64 +191,35 @@
         });
         return (await auth()).token;
     }
-    async function handleAuth() {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        const state = params.get('state');
-
-        if (code && state) {
-            // Trigger proxy workflow
-            const octokit = new Octokit();
-            
-            const run = await octokit.actions.createWorkflowDispatch({
-                owner: REPO_OWNER,
-                repo: REPO_NAME,
-                workflow_id: 'auth-proxy.yml',
-                ref: 'main',
-                inputs: { code, state }
-            });
-
-            // Poll for artifact (simplified example)
-            const artifacts = await octokit.actions.listWorkflowRunArtifacts({
-                owner: REPO_OWNER,
-                repo: REPO_NAME,
-                run_id: run.data.id
-            });
-
-            const { data } = await octokit.actions.downloadArtifact({
-                owner: REPO_OWNER,
-                repo: REPO_NAME,
-                artifact_id: artifacts.data.artifacts[0].id,
-                archive_format: 'zip'
-            });
-
-            const token = new TextDecoder().decode(data);
-            return token;
-        }
-        
-        // Start OAuth flow
-        const state = Math.random().toString(36).substring(2);
-        window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&state=${state}&scope=repo`;
-        return null;
-    }
-
-    async function triggerWorkflow(inputValue) {
-        const token = await handleAuth();
-        if (!token) return;
-
-        const octokit = new Octokit({ auth: token });
-        
-        await octokit.repos.createDispatchEvent({
-            owner: REPO_OWNER,
-            repo: REPO_NAME,
-            event_type: 'process-input',
-            client_payload: { text: inputValue }
-        });
-
-        // Update UI
-        responseText.textContent = 'Processing started! Check GitHub Actions.';
-        responseLabel.classList.remove('hidden');
-    }
+   async function processInput(text) {
+  try {
+    // Step 1: Trigger processing
+    const response = await fetch('http://your-server:3000/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    
+    const { run_id, status_url } = await response.json();
+    
+    // Step 2: Poll for results
+    const checkResult = async () => {
+      const resultRes = await fetch(`http://your-server:3000/results/${run_id}`);
+      
+      if (resultRes.status === 200) {
+        const result = await resultRes.text();
+        document.getElementById('result').textContent = result;
+      } else {
+        setTimeout(checkResult, 3000); // Check again after 3 seconds
+      }
+    };
+    
+    checkResult();
+    
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
     </script>
 </body>
 </html>
