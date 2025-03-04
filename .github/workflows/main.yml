@@ -23,8 +23,8 @@ jobs:
         id: analyze
         run: |
           echo "${{ github.event.inputs.text }}" > input.txt
-          python analyze.py input.txt > result.txt
-          echo "result=$(cat result.txt)" >> $GITHUB_OUTPUT
+          python analyze.py input.txt > output.txt
+          echo "result=$(cat output.txt)" >> $GITHUB_OUTPUT
           
       - name: Upload result
         uses: actions/upload-artifact@v4
