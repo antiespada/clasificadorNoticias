@@ -211,7 +211,7 @@
       
       if (resultRes.status === 200) {
         const result = await resultRes.text();
-        document.getElementById('result').textContent = result;
+        document.getElementById('response-text').textContent = result;
       } else {
         setTimeout(checkResult, 3000); // Check again after 3 seconds
       }
