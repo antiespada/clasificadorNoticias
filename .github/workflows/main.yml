@@ -23,7 +23,7 @@ jobs:
         id: analyze
         run: |
           echo "${{ github.event.inputs.text }}" > input.txt
-          python analyze.py input.txt > output.txt
+          python ai_model.py input.txt > output.txt
           echo "result=$(cat output.txt)" >> $GITHUB_OUTPUT
           
       - name: Upload result
