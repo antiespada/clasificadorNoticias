@@ -207,7 +207,7 @@
     
     // Step 2: Poll for results
     const checkResult = async () => {
-      const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me:3000/results/${run_id}`);
+      const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me/results/${run_id}`);
       
       if (resultRes.status === 200) {
         const result = await resultRes.text();
