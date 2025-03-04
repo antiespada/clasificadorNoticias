@@ -189,8 +189,8 @@
               // Parse the HTML on the client side
               const parser = new DOMParser();
               const doc = parser.parseFromString(htmlText, 'text/html');
+                console.log(doc);
               const firstParagraph = doc.querySelector('p');
-              
               if (firstParagraph) {
                 const paragraphText = firstParagraph.textContent.trim();
                 processInput(paragraphText);
