@@ -194,7 +194,7 @@
    async function processInput(text) {
   try {
     // Step 1: Trigger processing
-    const response = await fetch('http://your-server:3000/process', {
+    const response = await fetch('https://watery-topaz-thunder.glitch.me//process', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text })
@@ -204,7 +204,7 @@
     
     // Step 2: Poll for results
     const checkResult = async () => {
-      const resultRes = await fetch(`http://your-server:3000/results/${run_id}`);
+      const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me/:3000/results/${run_id}`);
       
       if (resultRes.status === 200) {
         const result = await resultRes.text();
