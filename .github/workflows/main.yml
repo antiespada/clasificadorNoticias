@@ -3,27 +3,31 @@ on:
   workflow_dispatch:
     inputs:
       text:
-        description: 'Text to process'
+        description: 'Text to analyze'
         required: true
+        type: string
 
 jobs:
-  process:
+  analyze:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
           
-      - name: Process text
+      - name: Analyze text
+        id: analyze
         run: |
-          echo "${{ inputs.text }}" > input.txt
-          python ai_model.py input.txt > output.txt
+          echo "${{ github.event.inputs.text }}" > input.txt
+          python analyze.py input.txt > result.txt
+          echo "result=$(cat result.txt)" >> $GITHUB_OUTPUT
           
       - name: Upload result
         uses: actions/upload-artifact@v4
         with:
-          name: result
-          path: output.txt
+          name: analysis-result
+          path: result.txt
