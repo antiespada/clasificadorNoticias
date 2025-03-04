@@ -192,7 +192,7 @@
               // Parse the HTML on the client side
               const parser = new DOMParser();
               const doc = parser.parseFromString(htmlText, 'text/html');
-                console.log(doc);
+                //console.log(doc);
               const firstParagraph = doc.querySelector('p');
               if (firstParagraph) {
                 const paragraphText = firstParagraph.textContent.trim();
@@ -229,7 +229,7 @@
     
         // Remove the "Processed: " prefix and trim extra whitespace/newlines
         const result = processedText.replace("Processed: ", "").trim();
-          console.log(result);
+          //console.log(result);
         responseLabel.classList.remove('hidden');
         document.getElementById('response-text').textContent = result;
       } else {
