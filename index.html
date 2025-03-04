@@ -165,18 +165,24 @@
 
         // Handle text input
         const textInput = document.getElementById('textInput');
-        textInput.addEventListener('input', (event) => {
+        textInput.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault(); // Prevents the default action (e.g., adding a newline)
             const text = event.target.value;
             const firstLine = text.split('\n')[0]; // Get the first line
             processInput(firstLine); // Send the first line to the workflow
+          }
         });
+
 
         // Handle link input
         const linkInput = document.getElementById('linkInput');
         linkInput.addEventListener('input', (event) => {
+            if (event.key === 'Enter') {
+            event.preventDefault(); // Prevents the default action (e.g., adding a newline)
             const link = event.target.value;
-            // For links, you can send the link itself or scrape the first line
-            processInput(link); // Send the link to the workflow
+            processInput(link); // Send the first line to the workflow
+          }
         });
 
         // Function to trigger the GitHub Actions workflow
@@ -210,11 +216,11 @@
       const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me/results/${run_id}`);
       
       if (resultRes.status === 200) {
-        const result = await  resultRes.json();
-        const processedText = result.result; // e.g. "Processed: b\n\n"
+        const answer = await  resultRes.json();
+        const processedText = answer.result; // e.g. "Processed: b\n\n"
     
         // Remove the "Processed: " prefix and trim extra whitespace/newlines
-        result = processedText.replace("Processed: ", "").trim();
+        const result = processedText.replace("Processed: ", "").trim();
           console.log(result);
         responseLabel.classList.remove('hidden');
         document.getElementById('response-text').textContent = result;
