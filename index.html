@@ -179,24 +179,21 @@
        const linkInput = document.getElementById('linkInput');
         linkInput.addEventListener('keydown', async (event) => {
           if (event.key === 'Enter') {
-            event.preventDefault(); // Prevents the default action (e.g., adding a newline)
+            event.preventDefault();
             const link = event.target.value;
             try {
-              const response = await fetch(link);
-              if (!response.ok) {
-                console.error('Failed to fetch the link, status:', response.status);
-                return;
-              }
+              const proxyUrl = `https://your-server-domain/proxy?url=${encodeURIComponent(link)}`;
+              const response = await fetch(proxyUrl);
               const htmlText = await response.text();
               
-              // Parse the HTML using DOMParser
+              // Parse the HTML on the client side
               const parser = new DOMParser();
               const doc = parser.parseFromString(htmlText, 'text/html');
               const firstParagraph = doc.querySelector('p');
               
               if (firstParagraph) {
                 const paragraphText = firstParagraph.textContent.trim();
-                processInput(paragraphText); // Send the first paragraph text to the workflow
+                processInput(paragraphText);
               } else {
                 console.error('No paragraph element found in the fetched page.');
               }
