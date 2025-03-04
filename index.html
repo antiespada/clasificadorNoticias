@@ -182,7 +182,7 @@
             event.preventDefault();
             const link = event.target.value;
             try {
-              const proxyUrl = `https://your-server-domain/proxy?url=${encodeURIComponent(link)}`;
+              const proxyUrl = `https://watery-topaz-thunder.glitch.me/proxy?url=${encodeURIComponent(link)}`;
               const response = await fetch(proxyUrl);
               const htmlText = await response.text();
               
