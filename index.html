@@ -210,7 +210,11 @@
       const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me/results/${run_id}`);
       
       if (resultRes.status === 200) {
-        const result = await resultRes.text();
+        const result = await  resultRes.json();
+        const processedText = result.result; // e.g. "Processed: b\n\n"
+    
+        // Remove the "Processed: " prefix and trim extra whitespace/newlines
+        result = processedText.replace("Processed: ", "").trim();
           console.log(result);
         responseLabel.classList.remove('hidden');
         document.getElementById('response-text').textContent = result;
