@@ -5,6 +5,8 @@ import torch
 from collections import Counter
 import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+tf.config.set_visible_devices([], 'GPU')
+
 
 # Configuración inicial: modelo BERT y cargamos el modelo clasificador guardado
 model_name = "bert-base-multilingual-cased"  # O 'bert-base-multilingual-cased' para español
