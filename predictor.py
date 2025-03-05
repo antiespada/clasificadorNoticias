@@ -56,6 +56,9 @@ def predict_class(text):
     pred_probs = modelo.predict(embedding)
     pred_class = int(np.argmax(pred_probs, axis=1)[0])
     return pred_class, label_to_topic.get(pred_class, "Desconocido")
+def retorn_class(text):
+    clase_idx, clase_nombre = predict_class(text)
+    return clase_nombre
 
 if __name__ == '__main__':
     # Solicitar al usuario que ingrese una noticia
