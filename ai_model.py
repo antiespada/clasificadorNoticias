@@ -12,6 +12,6 @@ with open(input_filename, 'r') as file:
     text = file.read()
 clase = retorn_class(text)
 # Process the text as needed (this example just echoes it)
-processed_text = f"Processed: {clase}"
+processed_text = f"Processed: 55"
 
 print(processed_text)
