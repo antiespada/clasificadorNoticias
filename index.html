@@ -7,9 +7,8 @@
     <script src="https://unpkg.com/@octokit/rest@19.0.0/dist-sdk/index.js"></script>
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #1e1e2f;
-            color: #ffffff;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,94 +17,98 @@
         }
 
         .container {
-            background-color: #2a2a3a;
+            background-color: #ffffff;
             padding: 2rem;
             border-radius: 12px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
             width: 400px;
         }
 
         h1 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             margin-bottom: 1.5rem;
+            color: #333;
+            font-weight: bold;
         }
 
-        .input-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 1rem;
-        }
-
-        .input-group input {
-            flex: 1;
-            padding: 0.75rem;
+        .button {
+            display: block;
+            width: 100%;
+            padding: 0.85rem;
+            margin: 0.5rem 0;
             font-size: 1rem;
+            color: #fff;
+            background-color: #007bff;
             border: none;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        .button, .submit-button {
-            padding: 0.75rem;
-            font-size: 1rem;
-            color: #ffffff;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            margin: 0.5rem 0;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .input-container {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 100%;
         }
 
-        .button:hover, .submit-button:hover {
-            background-color: #45a049;
+        .input-container input {
+            width: calc(100% - 20px);
+            padding: 0.85rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .submit-button {
+            width: calc(100% - 20px);
+            padding: 0.85rem;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background-color: #218838;
         }
 
         .hidden {
             display: none;
         }
-
-        #loading {
-            display: none;
-            margin-top: 1rem;
-            font-size: 1rem;
-            color: #aaa;
-        }
-
-        #response-label {
-            margin-top: 1rem;
-            font-size: 1.2rem;
-            color: #fff;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Introduce tu contenido</h1>
-        <button class="button" id="fileButton">Subir Archivo</button>
-        <button class="button" id="textButton">Introducir Texto</button>
-        <button class="button" id="linkButton">Ingresar Link</button>
+        <h1>Elige cómo comprobar</h1>
+        <button class="button" id="fileButton">Sube un archivo</button>
+        <button class="button" id="textButton">Introduce texto</button>
+        <button class="button" id="linkButton">Danos un link</button>
 
-        <div class="input-group hidden" id="fileInputContainer">
+        <div class="input-container hidden" id="fileInputContainer">
             <input type="file" id="fileInput">
-            <button class="submit-button" id="fileSubmit">Enviar</button>
         </div>
 
-        <div class="input-group hidden" id="textInputContainer">
+        <div class="input-container hidden" id="textInputContainer">
             <input type="text" id="textInput" placeholder="Escribe aquí...">
-            <button class="submit-button" id="textSubmit">Enviar</button>
+            <button class="submit-button">Enviar</button>
         </div>
 
-        <div class="input-group hidden" id="linkInputContainer">
+        <div class="input-container hidden" id="linkInputContainer">
             <input type="url" id="linkInput" placeholder="Pega el link aquí...">
-            <button class="submit-button" id="linkSubmit">Enviar</button>
+            <button class="submit-button">Enviar</button>
         </div>
-
-        <div id="loading">Procesando...</div>
-        <div id="response-label" class="hidden"><strong>Respuesta:</strong> <span id="response-text"></span></div>
     </div>
 
     <script>
@@ -114,49 +117,17 @@
             text: document.getElementById('textButton'),
             link: document.getElementById('linkButton')
         };
-        
         const inputs = {
             file: document.getElementById('fileInputContainer'),
             text: document.getElementById('textInputContainer'),
             link: document.getElementById('linkInputContainer')
         };
-        
-        const responseLabel = document.getElementById('response-label');
-        const responseText = document.getElementById('response-text');
-        const loading = document.getElementById('loading');
 
         Object.keys(buttons).forEach(key => {
             buttons[key].addEventListener('click', () => {
                 Object.values(inputs).forEach(input => input.classList.add('hidden'));
                 inputs[key].classList.remove('hidden');
-                responseLabel.classList.add('hidden');
             });
-        });
-
-        function showLoading() {
-            loading.style.display = 'block';
-            responseLabel.classList.add('hidden');
-        }
-
-        function hideLoading(result) {
-            loading.style.display = 'none';
-            responseLabel.classList.remove('hidden');
-            responseText.textContent = result;
-        }
-
-        document.getElementById('textSubmit').addEventListener('click', () => {
-            showLoading();
-            setTimeout(() => hideLoading("Texto procesado"), 2000);
-        });
-
-        document.getElementById('fileSubmit').addEventListener('click', () => {
-            showLoading();
-            setTimeout(() => hideLoading("Archivo procesado"), 2000);
-        });
-
-        document.getElementById('linkSubmit').addEventListener('click', () => {
-            showLoading();
-            setTimeout(() => hideLoading("Link procesado"), 2000);
         });
     </script>
 </body>
