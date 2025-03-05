@@ -12,7 +12,7 @@ tokenizer = BertTokenizer.from_pretrained(model_name)
 bert_model = BertModel.from_pretrained(model_name)
 
 # Seleccionar dispositivo: usar MPS si está disponible, sino CPU
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+device = torch.device("cpu")
 bert_model.to(device)
 
 # Cargar el modelo clasificador (Keras)
