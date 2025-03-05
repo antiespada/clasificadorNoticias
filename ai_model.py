@@ -1,4 +1,5 @@
 import sys
+from predictor import *
 
 # Ensure a filename is provided
 if len(sys.argv) < 2:
@@ -9,8 +10,8 @@ if len(sys.argv) < 2:
 input_filename = sys.argv[1]
 with open(input_filename, 'r') as file:
     text = file.read()
-
+clase = retorn_class(text)
 # Process the text as needed (this example just echoes it)
-processed_text = f"Processed: {text}"
+processed_text = f"Processed: {clase}"
 
 print(processed_text)
