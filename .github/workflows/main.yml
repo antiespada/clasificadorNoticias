@@ -24,7 +24,7 @@ jobs:
         env:
           CUDA_VISIBLE_DEVICES: "-1"
         run: |
-          pip install transformers torch numpy tensorflow
+          pip install transformers torch numpy tensorflow-cpu
           echo "${{ github.event.inputs.text }}" > input.txt
           python ai_model.py input.txt > output.txt
           echo "result=$(cat output.txt)" >> $GITHUB_OUTPUT
