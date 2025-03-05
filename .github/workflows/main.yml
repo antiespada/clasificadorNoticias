@@ -21,6 +21,8 @@ jobs:
           
       - name: Analyze text
         id: analyze
+        env:
+          CUDA_VISIBLE_DEVICES: "-1"
         run: |
           pip install transformers torch numpy tensorflow
           echo "${{ github.event.inputs.text }}" > input.txt
