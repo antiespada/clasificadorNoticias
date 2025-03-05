@@ -18,13 +18,26 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          
+
+      # NUEVO: Cachear dependencias de pip
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt  # Usa un archivo con dependencias
+
       - name: Analyze text
         id: analyze
         env:
           CUDA_VISIBLE_DEVICES: "-1"
         run: |
-          pip install transformers torch numpy tensorflow-cpu
           echo "${{ github.event.inputs.text }}" > input.txt
           python ai_model.py input.txt > output.txt
           echo "result=$(cat output.txt)" >> $GITHUB_OUTPUT
