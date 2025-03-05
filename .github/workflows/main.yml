@@ -22,6 +22,7 @@ jobs:
       - name: Analyze text
         id: analyze
         run: |
+          pip install transformers torch numpy tensorflow scikit-learn matplotlib seaborn
           echo "${{ github.event.inputs.text }}" > input.txt
           python ai_model.py input.txt > output.txt
           echo "result=$(cat output.txt)" >> $GITHUB_OUTPUT
