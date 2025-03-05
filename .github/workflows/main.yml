@@ -19,19 +19,19 @@ jobs:
         with:
           python-version: '3.9'
 
-      # NUEVO: Cachear dependencias de pip
+      # Cachear dependencias sin usar requirements.txt
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('.github/workflows/main.yml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt  # Usa un archivo con dependencias
+          pip install transformers torch numpy tensorflow-cpu
 
       - name: Analyze text
         id: analyze
