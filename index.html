@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Processing</title>
+    <title>Procesador de Noticias</title>
     <script src="https://unpkg.com/@octokit/rest@19.0.0/dist-sdk/index.js"></script>
     <style>
         body {
@@ -19,29 +19,28 @@
         .container {
             background-color: #ffffff;
             padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 400px;
+            width: 350px;
         }
 
         h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             margin-bottom: 1.5rem;
             color: #333;
-            font-weight: bold;
         }
 
         .button {
             display: block;
             width: 100%;
-            padding: 0.85rem;
+            padding: 0.75rem;
             margin: 0.5rem 0;
             font-size: 1rem;
             color: #fff;
             background-color: #007bff;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
@@ -52,39 +51,42 @@
 
         .input-container {
             margin-top: 1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
         }
 
         .input-container input {
-            width: calc(100% - 20px);
-            padding: 0.85rem;
+            width: 100%;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
             font-size: 1rem;
             border: 1px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .submit-button {
-            width: calc(100% - 20px);
-            padding: 0.85rem;
-            margin-top: 1rem;
-            font-size: 1rem;
-            color: #fff;
-            background-color: #28a745;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .submit-button:hover {
-            background-color: #218838;
+            border-radius: 5px;
         }
 
         .hidden {
+            display: none;
+        }
+
+        #loading {
+            display: none;
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        #loading span {
+            animation: blink 1.5s infinite;
+        }
+
+        #response-label {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
             display: none;
         }
     </style>
@@ -102,13 +104,14 @@
 
         <div class="input-container hidden" id="textInputContainer">
             <input type="text" id="textInput" placeholder="Escribe aquí...">
-            <button class="submit-button">Enviar</button>
         </div>
 
         <div class="input-container hidden" id="linkInputContainer">
             <input type="url" id="linkInput" placeholder="Pega el link aquí...">
-            <button class="submit-button">Enviar</button>
         </div>
+
+        <div id="loading">Procesando<span>.</span><span>.</span><span>.</span></div>
+        <div id="response-label"><strong>Respuesta:</strong> <span id="response-text"></span></div>
     </div>
 
     <script>
@@ -117,17 +120,96 @@
             text: document.getElementById('textButton'),
             link: document.getElementById('linkButton')
         };
+
         const inputs = {
             file: document.getElementById('fileInputContainer'),
             text: document.getElementById('textInputContainer'),
             link: document.getElementById('linkInputContainer')
         };
 
+        const responseLabel = document.getElementById('response-label');
+        const responseText = document.getElementById('response-text');
+        const loading = document.getElementById('loading');
+
         Object.keys(buttons).forEach(key => {
             buttons[key].addEventListener('click', () => {
                 Object.values(inputs).forEach(input => input.classList.add('hidden'));
                 inputs[key].classList.remove('hidden');
+                responseLabel.style.display = 'none';
             });
+        });
+
+        function showLoading() {
+            loading.style.display = 'block';
+            responseLabel.style.display = 'none';
+        }
+
+        function hideLoading(result) {
+            loading.style.display = 'none';
+            responseLabel.style.display = 'block';
+            responseText.textContent = result;
+        }
+
+        async function processInput(text) {
+            showLoading();
+            try {
+                const response = await fetch('https://watery-topaz-thunder.glitch.me/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const { run_id } = await response.json();
+
+                const checkResult = async () => {
+                    const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me/results/${run_id}`);
+                    if (resultRes.status === 200) {
+                        const answer = await resultRes.json();
+                        hideLoading(answer.result.replace("Processed: ", "").trim());
+                    } else {
+                        setTimeout(checkResult, 3000);
+                    }
+                };
+                checkResult();
+            } catch (error) {
+                console.error('Error:', error);
+                hideLoading("Error en el procesamiento.");
+            }
+        }
+
+        document.getElementById('textInput').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                processInput(event.target.value);
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => processInput(e.target.result.split('\n')[0]);
+            reader.readAsText(file);
+        });
+
+        document.getElementById('linkInput').addEventListener('keydown', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                showLoading();
+                try {
+                    const proxyUrl = `https://watery-topaz-thunder.glitch.me/proxy?url=${encodeURIComponent(event.target.value)}`;
+                    const response = await fetch(proxyUrl);
+                    const htmlText = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    const firstParagraph = doc.querySelector('p');
+                    if (firstParagraph) {
+                        processInput(firstParagraph.textContent.trim());
+                    } else {
+                        hideLoading("No se encontró texto en el link.");
+                    }
+                } catch (error) {
+                    hideLoading("Error al procesar el link.");
+                }
+            }
         });
     </script>
 </body>
