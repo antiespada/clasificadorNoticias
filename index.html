@@ -167,7 +167,7 @@
                         const answer = await resultRes.json();
                         console.log(answer.result);
                         arr = answer.result.replace("Processed: ", "").trim().split(" ");
-                        hideLoading(arr[arr.length-1].split(" ")[1];
+                        hideLoading(arr[arr.length-1].split(" ")[1]);
                     } else {
                         setTimeout(checkResult, 3000);
                     }
