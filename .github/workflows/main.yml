@@ -49,11 +49,7 @@ jobs:
         run: |
           echo "${{ github.event.inputs.text }}" > input.txt
           python ai_model.py input.txt > output.txt
-          {
-            echo "result<<EOF"
-            cat output.txt
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          echo "result=$(cat output.txt | tr '\n' ' ')" >> $GITHUB_OUTPUT
           
       - name: Debug output
         run: echo "Result: ${{ steps.analyze.outputs.result }}"
