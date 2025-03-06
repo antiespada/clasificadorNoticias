@@ -166,7 +166,7 @@
                     if (resultRes.status === 200) {
                         const answer = await resultRes.json();
                         arr = answer.result.replace("Processed: ", "").trim().split(" ");
-                        hideLoading(arr[arr.length-1]);
+                        hideLoading(arr[arr.length-1].split(" ")[1];
                     } else {
                         setTimeout(checkResult, 3000);
                     }
