@@ -63,9 +63,3 @@ def predict_class(text):
 def retorn_class(text):
     clase_idx, clase_nombre = predict_class(text)
     return clase_nombre
-
-if __name__ == '__main__':
-    # Solicitar al usuario que ingrese una noticia
-    texto = input("Ingrese el texto de la noticia: ")
-    clase_idx, clase_nombre = predict_class(texto)
-    print(f"La noticia se predice que es de la clase: {clase_nombre} (índice: {clase_idx})")
