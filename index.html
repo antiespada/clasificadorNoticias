@@ -165,7 +165,8 @@
                     const resultRes = await fetch(`https://watery-topaz-thunder.glitch.me/results/${run_id}`);
                     if (resultRes.status === 200) {
                         const answer = await resultRes.json();
-                        hideLoading(answer.result.replace("Processed: ", "").trim());
+                        arr = answer.result.replace("Processed: ", "").trim().split(" ");
+                        hideLoading(arr[arr.length-1]);
                     } else {
                         setTimeout(checkResult, 3000);
                     }
