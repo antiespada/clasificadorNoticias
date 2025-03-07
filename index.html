@@ -412,18 +412,27 @@
                     }
 
                     
-                    // Try to find the first meaningful paragraph by searching common article containers
-                    let firstParagraph = null;
+                    // Function to check if a paragraph is too short (e.g., less than a minimum word count)
+                    function isTooShort(para, minWords = 5) {
+                        const text = para.textContent.trim();
+                        const wordCount = text.split(/\s+/).length;
+                        return wordCount < minWords;  // Return true if the paragraph is too short
+                    }
                     
                     // Function to find the first valid paragraph
                     function findFirstValidParagraph(paragraphs) {
                         for (let para of paragraphs) {
-                            if (!isInHeader(para)) {
+                            // Check if the paragraph is not inside the header and is long enough
+                            if (!isInHeader(para) && !isTooShort(para)) {
                                 return para; // Return the first valid paragraph
                             }
                         }
                         return null; // Return null if no valid paragraph is found
                     }
+                    
+                    // Main code to search for the first valid paragraph in the article
+                    
+                    let firstParagraph = null;
                     
                     // First, look for a paragraph inside an <article> tag (common for articles)
                     const article = doc.querySelector('article');
