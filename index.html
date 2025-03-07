@@ -400,9 +400,12 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(htmlText, 'text/html');
                     
-                    // Function to check if a paragraph has at least 10 words
-                    function hasAtLeastTenWords(text) {
-                        return text.split(/\s+/).filter(Boolean).length >= 10;
+                   // Function to check if an element is inside a header section
+                    function isInHeader(element) {
+                        // Check if the element is inside a <header> tag or specific header classes
+                        return element.closest('header') !== null || 
+                               element.closest('.article-header') !== null || 
+                               element.closest('.entry-header') !== null;
                     }
                     
                     // Try to find the first meaningful paragraph by searching common article containers
@@ -411,41 +414,47 @@
                     // First, look for a paragraph inside an <article> tag (common for articles)
                     const article = doc.querySelector('article');
                     if (article) {
-                        firstParagraph = article.querySelector('p');
+                        // Get all paragraphs in the article
+                        const paragraphs = article.querySelectorAll('p');
+                        
+                        // Loop through paragraphs and skip those in the header section
+                        for (let para of paragraphs) {
+                            if (!isInHeader(para)) {
+                                firstParagraph = para;
+                                break; // Stop as soon as we find the first non-header paragraph
+                            }
+                        }
                     }
                     
                     // If no paragraph is found inside <article>, try finding the first paragraph inside other common containers
                     if (!firstParagraph) {
-                        firstParagraph = doc.querySelector('.article-body p');  // Common class for article content
+                        const articleBody = doc.querySelector('.article-body');
+                        if (articleBody) {
+                            const paragraphs = articleBody.querySelectorAll('p');
+                            for (let para of paragraphs) {
+                                if (!isInHeader(para)) {
+                                    firstParagraph = para;
+                                    break;
+                                }
+                            }
+                        }
                     }
                     
                     // If still not found, try looking for the first <p> in the document
                     if (!firstParagraph) {
-                        firstParagraph = doc.querySelector('p');
-                    }
-                    
-                    // If the first paragraph is found, check if it has at least 10 words
-                    if (firstParagraph) {
-                        let textContent = firstParagraph.textContent.trim();
-                        
-                        // If the paragraph has less than 10 words, look for the next paragraph in the same container
-                        if (!hasAtLeastTenWords(textContent)) {
-                            let nextParagraph = firstParagraph.nextElementSibling;
-                            while (nextParagraph && nextParagraph.tagName.toLowerCase() !== 'p') {
-                                console.log(nextParagraph);
-                                nextParagraph = nextParagraph.nextElementSibling;
-                            }
-                    
-                            // If a next paragraph is found and has at least 10 words, use it
-                            if (nextParagraph && hasAtLeastTenWords(nextParagraph.textContent.trim())) {
-                                textContent = nextParagraph.textContent.trim();
-                            } else {
-                                hideLoading("No encontró un texto adecuado.");
-                                return; // Exit if no valid paragraph is found
+                        const paragraphs = doc.querySelectorAll('p');
+                        for (let para of paragraphs) {
+                            if (!isInHeader(para)) {
+                                firstParagraph = para;
+                                break;
                             }
                         }
+                    }
                     
-                        processInput(textContent);
+                    // If a valid paragraph is found, process it
+                    if (firstParagraph) {
+                        let textContent = firstParagraph.textContent.trim();
+                        processInput(textContent); // Process the text content from the paragraph
                     } else {
                         hideLoading("No se encontró texto en el link.");
                     }
