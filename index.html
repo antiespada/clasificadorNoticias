@@ -405,7 +405,8 @@
                         // Check if the element is inside a <header> tag or specific header classes
                         return element.closest('header') !== null || 
                                element.closest('.article-header') !== null || 
-                               element.closest('.entry-header') !== null;
+                               element.closest('.entry-header') !== null || 
+                               element.closest('figure') !== null;
                     }
                     
                     // Try to find the first meaningful paragraph by searching common article containers
