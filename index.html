@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Procesador de Noticias</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="https://unpkg.com/@octokit/rest@19.0.0/dist-sdk/index.js"></script>
     <style>
         * {
@@ -57,6 +58,11 @@
 
         .button:hover {
             background: #0056b3;
+        }
+
+        .button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
         }
 
         .button-right {
@@ -298,7 +304,7 @@
             document.getElementById('linkInput').value = '';
         }
 
-        Object.keys(buttons).forEach(key => {
+        Object.keys(inputs).forEach(key => {
             buttons[key].addEventListener('click', () => {
                 Object.values(inputs).forEach(input => input.classList.add('hidden'));
                 inputs[key].classList.remove('hidden');
