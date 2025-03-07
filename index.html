@@ -395,16 +395,38 @@
                 showLoading();
                 try {
                     const proxyUrl = `https://watery-topaz-thunder.glitch.me/proxy?url=${encodeURIComponent(link)}`;
-                    const response = await fetch(proxyUrl);
-                    const htmlText = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(htmlText, 'text/html');
-                    const firstParagraph = doc.querySelector('p');
-                    if (firstParagraph) {
-                        processInput(firstParagraph.textContent.trim());
-                    } else {
-                        hideLoading("No se encontró texto en el link.");
-                    }
+                const response = await fetch(proxyUrl);
+                const htmlText = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+                
+                // Try to find the first meaningful paragraph by searching common article containers
+                let firstParagraph = null;
+                
+                // First, look for a paragraph inside an <article> tag (common for articles)
+                const article = doc.querySelector('article');
+                if (article) {
+                    firstParagraph = article.querySelector('p');
+                }
+                
+                // If no paragraph is found inside <article>, try finding the first paragraph inside other common containers
+                if (!firstParagraph) {
+                    firstParagraph = doc.querySelector('.article-body p');  // Common class for article content
+                }
+                
+                // If still not found, try looking for the first <p> in the document
+                if (!firstParagraph) {
+                    firstParagraph = doc.querySelector('p');
+                }
+                
+                // If found, process the text; otherwise, handle the case where no paragraph is found
+                if (firstParagraph) {
+                    const textContent = firstParagraph.textContent.trim();
+                    processInput(textContent);
+                } else {
+                    hideLoading("No se encontró texto en el link.");
+                }
+
                 } catch (error) {
                     hideLoading("Error al procesar el link.");
                 }
