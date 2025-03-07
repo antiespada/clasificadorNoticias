@@ -408,6 +408,9 @@
                                element.closest('.entry-header') !== null || 
                                element.closest('figure') !== null;
                     }
+                    function hasAtLeastTenWords(text) {
+                        return text.split(/\s+/).filter(Boolean).length >= 10;
+                    }
                     
                     // Try to find the first meaningful paragraph by searching common article containers
                     let firstParagraph = null;
@@ -433,7 +436,7 @@
                         if (articleBody) {
                             const paragraphs = articleBody.querySelectorAll('p');
                             for (let para of paragraphs) {
-                                if (!isInHeader(para)) {
+                                if (!isInHeader(para) && hasAtLeastTenWords(para)) {
                                     firstParagraph = para;
                                     break;
                                 }
