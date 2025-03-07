@@ -207,18 +207,21 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
-            max-width: 500px;
+            /*max-width: 500px;*/
             position: relative;
             border-radius: 10px;
         }
 
         .modal-content img {
-            width: auto; /* Allows the image to retain its natural width */
-            height: auto; /* Ensures the image retains its natural height */
-            margin: 0 auto;
+            width: 90%;          /* Makes the image fill the width of the modal */
+            height: auto;         /* Adjusts the height automatically to maintain aspect ratio */
+            max-width: 90%;       /* Restricts the image width to 90% of the modal size to avoid stretching too much */
+            max-height: 80vh;     /* Optionally limit the height to avoid excessive scaling vertically */
+            margin: 0 auto;       /* Centers the image */
             display: block;
-            border-radius: 8px;
+            border-radius: 8px;   /* Optional: rounds the corners */
         }
+
 
         .close-modal {
             position: absolute;
