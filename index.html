@@ -226,33 +226,35 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Elige cómo comprobar</h1>
-        <button class="button" id="fileButton">Sube un archivo</button>
-        <button class="button" id="textButton">Introduce texto</button>
-        <button class="button" id="linkButton">Danos un link</button>
-
-        <div class="input-container hidden" id="fileInputContainer">
-            <input type="file" id="fileInput">
-            <button class="submit-button" id="submitFileButton">Enviar archivo</button>
+    <div>
+        <div class="container">
+            <h1>Elige cómo comprobar</h1>
+            <button class="button" id="fileButton">Sube un archivo</button>
+            <button class="button" id="textButton">Introduce texto</button>
+            <button class="button" id="linkButton">Danos un link</button>
+    
+            <div class="input-container hidden" id="fileInputContainer">
+                <input type="file" id="fileInput">
+                <button class="submit-button" id="submitFileButton">Enviar archivo</button>
+            </div>
+    
+            <div class="input-container hidden" id="textInputContainer">
+                <textarea id="textInput" placeholder="Escribe aquí..."></textarea>
+                <button class="submit-button" id="submitTextButton">Enviar texto</button>
+            </div>
+    
+            <div class="input-container hidden" id="linkInputContainer">
+                <input type="url" id="linkInput" placeholder="Pega el link aquí...">
+                <button class="submit-button" id="submitLinkButton">Enviar link</button>
+            </div>
+    
+            <div id="loading">Procesando<span>.</span><span>.</span><span>.</span></div>
+            <div id="response-label"><strong>Respuesta:</strong> <span id="response-text"></span></div>
         </div>
-
-        <div class="input-container hidden" id="textInputContainer">
-            <textarea id="textInput" placeholder="Escribe aquí..."></textarea>
-            <button class="submit-button" id="submitTextButton">Enviar texto</button>
-        </div>
-
-        <div class="input-container hidden" id="linkInputContainer">
-            <input type="url" id="linkInput" placeholder="Pega el link aquí...">
-            <button class="submit-button" id="submitLinkButton">Enviar link</button>
-        </div>
-
-        <div id="loading">Procesando<span>.</span><span>.</span><span>.</span></div>
-        <div id="response-label"><strong>Respuesta:</strong> <span id="response-text"></span></div>
-    </div>
 
     <!-- Botón que abre la ventana modal -->
     <button class="tiny-button" id="modelButton">Resultados del modelo</button>
+    </div>
 
     <!-- Ventana modal -->
     <div id="imageModal" class="modal">
