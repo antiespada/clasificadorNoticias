@@ -243,10 +243,7 @@
             file: document.getElementById('fileButton'),
             text: document.getElementById('textButton'),
             link: document.getElementById('linkButton'),
-            image: document.getElementById('modelButton'),
-            submitFile: document.getElementById('submitFileButton'),
-            submitText: document.getElementById('submitTextButton'),
-            submitLink: document.getElementById('submitLinkButton')
+            image: document.getElementById('modelButton')
         };
 
         const inputs = {
@@ -261,6 +258,9 @@
         const loading = document.getElementById('loading');
         const modal = document.getElementById('imageModal');
         const closeModal = document.getElementById('closeModal');
+        const submitFile = document.getElementById('submitFileButton');
+        const submitText = document.getElementById('submitTextButton');
+        const submitLink = document.getElementById('submitLinkButton');
 
         function clearInputs() {
             document.getElementById('fileInput').value = '';
