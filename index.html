@@ -411,9 +411,6 @@
                                element.closest('.ft-mol-writer__title') !== null;
                     }
 
-                    function hasAtLeastTenWords(text) {
-                        return text.split(/\s+/).filter(Boolean).length >= 10;
-                    }
                     
                     // Try to find the first meaningful paragraph by searching common article containers
                     let firstParagraph = null;
@@ -421,7 +418,7 @@
                     // Function to find the first valid paragraph
                     function findFirstValidParagraph(paragraphs) {
                         for (let para of paragraphs) {
-                            if (!isInHeader(para) && hasAtLeastTenWords(para)) {
+                            if (!isInHeader(para)) {
                                 return para; // Return the first valid paragraph
                             }
                         }
