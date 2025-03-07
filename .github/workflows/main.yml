@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       text:
-        description: 'Text to analyze'
+        description: 'Text to analyze (URL or plain text)'
         required: true
         type: string
 
@@ -26,6 +26,7 @@ jobs:
           echo "torch" >> requirements.txt
           echo "numpy" >> requirements.txt
           echo "tensorflow-cpu" >> requirements.txt
+          echo "newspaper3k" >> requirements.txt  # Añadimos newspaper3k para procesar URLs
 
       # 🔹 Cachear dependencias basándose en `requirements.txt`
       - name: Cache Python dependencies
@@ -42,12 +43,32 @@ jobs:
           pip install -r requirements.txt
           pip freeze > requirements.txt  # 🔹 Guardar las versiones exactas
 
+      # 🔹 Nuevo paso para extraer el primer párrafo si es una URL
+      - name: Extract text from URL or use input
+        run: |
+          python -c "
+          import sys
+          from newspaper import Article
+          text = '${{ github.event.inputs.text }}'
+          if text.startswith('http://') or text.startswith('https://'):
+              try:
+                  article = Article(text)
+                  article.download()
+                  article.parse()
+                  content = article.text
+                  first_paragraph = content.split('\n\n')[0].strip() if content else 'No content found'
+                  text = first_paragraph
+              except Exception as e:
+                  text = f'Error extracting content: {str(e)}'
+          with open('input.txt', 'w', encoding='utf-8') as f:
+              f.write(text)
+          "
+
       - name: Analyze text
         id: analyze
         env:
           CUDA_VISIBLE_DEVICES: "-1"
         run: |
-          echo "${{ github.event.inputs.text }}" > input.txt
           python ai_model.py input.txt > output.txt
           {
             echo "result<<EOF"
