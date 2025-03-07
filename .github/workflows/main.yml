@@ -19,15 +19,24 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 🔹 Generar requirements.txt con las dependencias correctas
+      # 🔹 Generar requirements.txt con la versión correcta de TensorFlow
       - name: Create requirements.txt
         run: |
           echo "transformers==4.38.2" > requirements.txt
           echo "torch==2.0.1" >> requirements.txt
           echo "numpy==1.26.4" >> requirements.txt
-          echo "tensorflow-cpu==2.15.0" >> requirements.txt
-          echo "newspaper3k==0.2.8" >> requirements.txt
-          echo "lxml_html_clean" >> requirements.txt  # Añadimos la dependencia faltante
+          echo "tensorflow-cpu==2.16.2" >> requirements.txt  # Actualizado a 2.16.2
+          echo "requests==2.31.0" >> requirements.txt
+          echo "beautifulsoup4==4.12.3" >> requirements.txt
+
+      # 🔹 Cachear dependencias basándose en `requirements.txt`
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
@@ -39,15 +48,15 @@ jobs:
         run: |
           python -c "
           import sys
-          from newspaper import Article
+          import requests
+          from bs4 import BeautifulSoup
           text = '''${{ github.event.inputs.text }}'''
           if text.startswith('http://') or text.startswith('https://'):
               try:
-                  article = Article(text)
-                  article.download()
-                  article.parse()
-                  content = article.text
-                  first_paragraph = content.split('\n\n')[0].strip() if content else 'No content found'
+                  response = requests.get(text, timeout=10)
+                  soup = BeautifulSoup(response.text, 'html.parser')
+                  paragraphs = soup.find_all('p')
+                  first_paragraph = paragraphs[0].get_text().strip() if paragraphs else 'No paragraphs found'
                   text = first_paragraph
               except Exception as e:
                   text = f'Error extracting content: {str(e)}'
