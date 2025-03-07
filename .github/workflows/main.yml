@@ -19,37 +19,28 @@ jobs:
         with:
           python-version: '3.9'
 
-      # 🔹 Generar requirements.txt si no existe
+      # 🔹 Generar requirements.txt con las dependencias correctas
       - name: Create requirements.txt
         run: |
-          echo "transformers" > requirements.txt
-          echo "torch" >> requirements.txt
-          echo "numpy" >> requirements.txt
-          echo "tensorflow-cpu" >> requirements.txt
-          echo "newspaper3k" >> requirements.txt  # Añadimos newspaper3k para procesar URLs
-
-      # 🔹 Cachear dependencias basándose en `requirements.txt`
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          echo "transformers==4.38.2" > requirements.txt
+          echo "torch==2.0.1" >> requirements.txt
+          echo "numpy==1.26.4" >> requirements.txt
+          echo "tensorflow-cpu==2.15.0" >> requirements.txt
+          echo "newspaper3k==0.2.8" >> requirements.txt
+          echo "lxml_html_clean" >> requirements.txt  # Añadimos la dependencia faltante
 
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          pip freeze > requirements.txt  # 🔹 Guardar las versiones exactas
 
-      # 🔹 Nuevo paso para extraer el primer párrafo si es una URL
+      # 🔹 Extraer texto de URL o usar texto plano directamente
       - name: Extract text from URL or use input
         run: |
           python -c "
           import sys
           from newspaper import Article
-          text = '${{ github.event.inputs.text }}'
+          text = '''${{ github.event.inputs.text }}'''
           if text.startswith('http://') or text.startswith('https://'):
               try:
                   article = Article(text)
