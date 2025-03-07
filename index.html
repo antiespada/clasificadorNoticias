@@ -432,6 +432,7 @@
                         if (!hasAtLeastTenWords(textContent)) {
                             let nextParagraph = firstParagraph.nextElementSibling;
                             while (nextParagraph && nextParagraph.tagName.toLowerCase() !== 'p') {
+                                console.log(nextParagraph);
                                 nextParagraph = nextParagraph.nextElementSibling;
                             }
                     
