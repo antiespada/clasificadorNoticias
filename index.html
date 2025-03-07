@@ -254,6 +254,7 @@
         const responseLabel = document.getElementById('response-label');
         const responseText = document.getElementById('response-text');
         const loading = document.getElementById('loading');
+        const butModal = document.getElementById('modelButton');
         const modal = document.getElementById('imageModal');
         const closeModal = document.getElementById('closeModal');
         const submitFile = document.getElementById('submitFileButton');
@@ -321,7 +322,7 @@
             }
         }
          // Abrir el modal al hacer clic en el botón
-        buttons.image.addEventListener('click', () => {
+        butModal.addEventListener('click', () => {
             modal.style.display = 'block';
         });
 
