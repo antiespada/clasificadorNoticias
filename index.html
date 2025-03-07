@@ -28,8 +28,9 @@
             border-radius: 18px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             text-align: center;
-            width: 400px; /* Aumenté un poco el ancho para mayor comodidad */
+            width: 400px; 
             transition: all 0.3s ease;
+            position: relative; /* Para ajustar el botón en la esquina */
         }
 
         h1 {
@@ -58,6 +59,14 @@
             background: #0056b3;
         }
 
+        .button-right {
+            position: absolute;
+            bottom: -3rem; /* Ajusta según sea necesario */
+            right: 0;
+            padding: 0.5rem 1rem;
+            background: #007aff;
+        }
+
         .input-container {
             margin-top: 1rem;
         }
@@ -81,7 +90,7 @@
             color: #8e8e93;
         }
 
-        .hidden {
+        .input-container.hidden {
             display: none;
         }
 
@@ -117,6 +126,26 @@
             font-weight: 400;
         }
 
+        /* Botón verde para enviar datos */
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+            background: #28a745; /* Verde para enviar */
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-button:hover {
+            background: #218838;
+        }
+
         /* Estilo para la imagen de la matriz */
         #matriz {
             max-width: 100%;
@@ -135,25 +164,30 @@
 
         <div class="input-container hidden" id="fileInputContainer">
             <input type="file" id="fileInput">
+            <button class="submit-button" id="submitFileButton">Enviar archivo</button>
         </div>
 
         <div class="input-container hidden" id="textInputContainer">
             <textarea id="textInput" placeholder="Escribe aquí..."></textarea>
+            <button class="submit-button" id="submitTextButton">Enviar texto</button>
         </div>
 
         <div class="input-container hidden" id="linkInputContainer">
             <input type="url" id="linkInput" placeholder="Pega el link aquí...">
+            <button class="submit-button" id="submitLinkButton">Enviar link</button>
         </div>
 
         <div id="loading">Procesando<span>.</span><span>.</span><span>.</span></div>
         <div id="response-label"><strong>Respuesta:</strong> <span id="response-text"></span></div>
     </div>
-    <div class="container">
-        <button class="button" id="modelButton">Muestra resultados del modelo</button>
-        <div class="input-container hidden" id="modelOutputContainer">
-            <img src="Matriz.png" id="matriz"/>
-        </div>
+
+    <!-- Botón que se mueve a la esquina derecha debajo del div principal -->
+    <button class="button-right button" id="modelButton">Resultados del modelo</button>
+
+    <div class="container hidden" id="modelOutputContainer">
+        <img src="Matriz.png" id="matriz"/>
     </div>
+
     <script>
         const buttons = {
             file: document.getElementById('fileButton'),
@@ -173,13 +207,21 @@
         const responseText = document.getElementById('response-text');
         const loading = document.getElementById('loading');
 
+        function clearInputs() {
+            document.getElementById('fileInput').value = '';
+            document.getElementById('textInput').value = '';
+            document.getElementById('linkInput').value = '';
+        }
+
         Object.keys(buttons).forEach(key => {
             buttons[key].addEventListener('click', () => {
                 Object.values(inputs).forEach(input => input.classList.add('hidden'));
                 inputs[key].classList.remove('hidden');
                 responseLabel.style.display = 'none';
+                clearInputs();
             });
         });
+
         function showLoading() {
             loading.style.display = 'block';
             responseLabel.style.display = 'none';
@@ -219,25 +261,26 @@
             }
         }
 
-        document.getElementById('textInput').addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                processInput(event.target.value);
+        document.getElementById('submitTextButton').addEventListener('click', () => {
+            const text = document.getElementById('textInput').value;
+            if (text) processInput(text);
+        });
+
+        document.getElementById('submitFileButton').addEventListener('click', () => {
+            const file = document.getElementById('fileInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => processInput(e.target.result.split('\n')[0]);
+                reader.readAsText(file);
             }
         });
 
-        document.getElementById('fileInput').addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => processInput(e.target.result.split('\n')[0]);
-            reader.readAsText(file);
-        });
-
-        document.getElementById('linkInput').addEventListener('keydown', async (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
+        document.getElementById('submitLinkButton').addEventListener('click', async () => {
+            const link = document.getElementById('linkInput').value;
+            if (link) {
                 showLoading();
                 try {
-                    const proxyUrl = `https://watery-topaz-thunder.glitch.me/proxy?url=${encodeURIComponent(event.target.value)}`;
+                    const proxyUrl = `https://watery-topaz-thunder.glitch.me/proxy?url=${encodeURIComponent(link)}`;
                     const response = await fetch(proxyUrl);
                     const htmlText = await response.text();
                     const parser = new DOMParser();
