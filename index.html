@@ -423,7 +423,7 @@
                         
                         // Loop through paragraphs and skip those in the header section
                         for (let para of paragraphs) {
-                            if (!isInHeader(para)) {
+                            if (!isInHeader(para)&& hasAtLeastTenWords(para)) {
                                 firstParagraph = para;
                                 break; // Stop as soon as we find the first non-header paragraph
                             }
@@ -448,7 +448,7 @@
                     if (!firstParagraph) {
                         const paragraphs = doc.querySelectorAll('p');
                         for (let para of paragraphs) {
-                            if (!isInHeader(para)) {
+                            if (!isInHeader(para)&& hasAtLeastTenWords(para)) {
                                 firstParagraph = para;
                                 break;
                             }
