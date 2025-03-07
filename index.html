@@ -409,12 +409,6 @@
                                element.closest('figure') !== null ||
                                element.closest('.ft-mol-writer__item') !== null;
                     }
-                    
-                    // Function to check if paragraph contains only a link
-                    function isOnlyLink(paragraph) {
-                        const links = paragraph.querySelectorAll('a');
-                        return links.length === 1 && paragraph.textContent.trim().length === 0;
-                    }
 
                     function hasAtLeastTenWords(text) {
                         return text.split(/\s+/).filter(Boolean).length >= 10;
@@ -426,7 +420,7 @@
                     // Function to find the first valid paragraph
                     function findFirstValidParagraph(paragraphs) {
                         for (let para of paragraphs) {
-                            if (!isInHeader(para) && !isOnlyLink(para) && hasAtLeastTenWords(para)) {
+                            if (!isInHeader(para) && hasAtLeastTenWords(para)) {
                                 return para; // Return the first valid paragraph
                             }
                         }
