@@ -207,7 +207,12 @@
         }
 
         .modal-content img {
-            width: 100%;
+            width: auto; /* Allows the image to retain its natural width */
+            height: auto; /* Ensures the image retains its natural height */
+            max-width: 100%; /* Ensures the image doesn’t overflow the modal */
+            max-height: 80vh; /* Optional: You can set a max-height so the image doesn't exceed the viewport height */
+            margin: 0 auto;
+            display: block;
             border-radius: 8px;
         }
 
