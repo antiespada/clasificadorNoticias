@@ -408,52 +408,46 @@
                                element.closest('.entry-header') !== null || 
                                element.closest('figure') !== null;
                     }
-                    function hasAtLeastTenWords(text) {
-                        console.log(text)
-                        return text.split(" ").length >= 10;
+                    
+                    // Function to check if paragraph contains only a link
+                    function isOnlyLink(paragraph) {
+                        const links = paragraph.querySelectorAll('a');
+                        return links.length === 1 && paragraph.textContent.trim().length === 0;
                     }
                     
                     // Try to find the first meaningful paragraph by searching common article containers
                     let firstParagraph = null;
                     
+                    // Function to find the first valid paragraph
+                    function findFirstValidParagraph(paragraphs) {
+                        for (let para of paragraphs) {
+                            if (!isInHeader(para) && !isOnlyLink(para)) {
+                                return para; // Return the first valid paragraph
+                            }
+                        }
+                        return null; // Return null if no valid paragraph is found
+                    }
+                    
                     // First, look for a paragraph inside an <article> tag (common for articles)
                     const article = doc.querySelector('article');
                     if (article) {
-                        // Get all paragraphs in the article
                         const paragraphs = article.querySelectorAll('p');
-                        
-                        // Loop through paragraphs and skip those in the header section
-                        for (let para of paragraphs) {
-                            if (!isInHeader(para)&& hasAtLeastTenWords(para)) {
-                                firstParagraph = para;
-                                break; // Stop as soon as we find the first non-header paragraph
-                            }
-                        }
+                        firstParagraph = findFirstValidParagraph(paragraphs);
                     }
                     
-                    // If no paragraph is found inside <article>, try finding the first paragraph inside other common containers
+                    // If no valid paragraph is found inside <article>, try finding the first paragraph inside other common containers
                     if (!firstParagraph) {
                         const articleBody = doc.querySelector('.article-body');
                         if (articleBody) {
                             const paragraphs = articleBody.querySelectorAll('p');
-                            for (let para of paragraphs) {
-                                if (!isInHeader(para) && hasAtLeastTenWords(para)) {
-                                    firstParagraph = para;
-                                    break;
-                                }
-                            }
+                            firstParagraph = findFirstValidParagraph(paragraphs);
                         }
                     }
                     
-                    // If still not found, try looking for the first <p> in the document
+                    // If still no valid paragraph, search for valid paragraphs outside of any specific containers
                     if (!firstParagraph) {
                         const paragraphs = doc.querySelectorAll('p');
-                        for (let para of paragraphs) {
-                            if (!isInHeader(para)&& hasAtLeastTenWords(para)) {
-                                firstParagraph = para;
-                                break;
-                            }
-                        }
+                        firstParagraph = findFirstValidParagraph(paragraphs);
                     }
                     
                     // If a valid paragraph is found, process it
