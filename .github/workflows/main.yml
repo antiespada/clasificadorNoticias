@@ -26,6 +26,9 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t text-processor:latest .
+        
+      - name: Run Docker container
+        run: docker run --rm -v ${{ github.workspace }}:/app text-processor:latest
 
       - name: Extract text from URL or use input
         run: |
@@ -46,9 +49,6 @@ jobs:
           with open('input.txt', 'w', encoding='utf-8') as f:
               f.write(text)
           "
-
-      - name: Run Docker container
-        run: docker run --rm -v ${{ github.workspace }}:/app text-processor:latest
 
       - name: Show output
         run: cat output.txt
