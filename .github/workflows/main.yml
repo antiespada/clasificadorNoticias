@@ -13,28 +13,20 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
 
-      # 🔹 Generar requirements.txt con la versión correcta de TensorFlow
+      # (Optional) Create requirements.txt if not already in your repo.
       - name: Create requirements.txt
         run: |
           echo "transformers==4.38.2" > requirements.txt
           echo "torch==2.0.1" >> requirements.txt
           echo "numpy==1.26.4" >> requirements.txt
-          echo "tensorflow-cpu==2.16.2" >> requirements.txt  # Actualizado a 2.16.2
+          echo "tensorflow-cpu==2.16.2" >> requirements.txt
           echo "requests==2.31.0" >> requirements.txt
           echo "beautifulsoup4==4.12.3" >> requirements.txt
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+      - name: Build Docker image
+        run: docker build -t text-processor:latest .
 
-      # 🔹 Extraer texto de URL o usar texto plano directamente
       - name: Extract text from URL or use input
         run: |
           python -c "
@@ -55,24 +47,15 @@ jobs:
               f.write(text)
           "
 
-      - name: Analyze text
-        id: analyze
-        env:
-          CUDA_VISIBLE_DEVICES: "-1"
-        run: |
-          python ai_model.py input.txt > output.txt
-          {
-            echo "result<<EOF"
-            cat output.txt
-            echo "EOF"
-          } >> "$GITHUB_OUTPUT"
-          
-      - name: Mostrar salida
+      - name: Run Docker container
+        run: docker run --rm -v ${{ github.workspace }}:/app text-processor:latest
+
+      - name: Show output
         run: cat output.txt
 
-      - name: Mostrar entrada
+      - name: Show input
         run: cat input.txt
-          
+
       - name: Upload result
         uses: actions/upload-artifact@v4
         with:
