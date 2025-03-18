@@ -14,21 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Try pulling the Docker image, if it exists
-      - name: Try to pull Docker image
-        id: docker-pull
+      # Build the Docker image locally if not cached
+      - name: Build Docker image
         run: |
-          docker pull your-docker-registry/text-processor:latest || echo "Image not found, will build locally"
-        continue-on-error: true
+          docker build -t text-processor:latest .
 
-      # Conditionally build the Docker image only if the pull fails
-      - name: Build Docker image if not pulled
-        if: steps.docker-pull.outcome == 'failure'
-        run: docker build -t your-docker-registry/text-processor:latest .
-
-      # Run Docker container (whether pulled or built)
+      # Run Docker container with mounted workspace
       - name: Run Docker container
-        run: docker run --rm -v ${{ github.workspace }}:/app your-docker-registry/text-processor:latest
+        run: docker run --rm -v ${{ github.workspace }}:/app text-processor:latest
 
       - name: Extract text from URL or use input
         run: |
