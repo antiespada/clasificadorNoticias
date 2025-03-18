@@ -19,14 +19,13 @@ jobs:
         id: check_image
         run: |
           if docker images -q text-processor:latest; then
-            echo "Docker image exists"
+            echo "Docker image exists locally"
           else
             echo "No Docker image found" && exit 1
-          fi
 
       # Conditionally build Docker image if it doesn't exist
       - name: Build Docker image
-        if: failure()  # Only run if the image check failed
+        if: failure()  # Build the Docker image if the check_image step failed
         run: |
           docker build -t text-processor:latest .
 
