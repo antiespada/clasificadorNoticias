@@ -14,12 +14,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Build the Docker image locally if not cached
+      # Check if Docker image already exists locally
+      - name: Check if Docker image exists
+        id: check_image
+        run: |
+          if docker images -q text-processor:latest; then
+            echo "Docker image exists"
+          else
+            echo "No Docker image found" && exit 1
+          fi
+
+      # Conditionally build Docker image if it doesn't exist
       - name: Build Docker image
+        if: failure()  # Only run if the image check failed
         run: |
           docker build -t text-processor:latest .
 
-      # Run Docker container with mounted workspace
+      # Run Docker container with the workspace mounted
       - name: Run Docker container
         run: docker run --rm -v ${{ github.workspace }}:/app text-processor:latest
 
